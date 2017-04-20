@@ -144,11 +144,8 @@ public class ExecutionDataReader {
 		if (executionDataVisitor == null) {
 			throw new IOException("No execution data visitor.");
 		}
-		final long id = in.readLong();
-		final String name = in.readUTF();
-		final boolean[] probes = in.readBooleanArray();
-		executionDataVisitor.visitClassExecution(new ExecutionData(id, name,
-				probes));
+		final ExecutionData execData = ExecutionData.read(in);
+		executionDataVisitor.visitClassExecution(execData);
 	}
 
 }

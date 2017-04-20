@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.jacoco.core.internal.instr;
 
+import org.jacoco.core.data.ExecutionData;
 import org.jacoco.core.internal.flow.ClassProbesVisitor;
 import org.jacoco.core.internal.flow.MethodProbesVisitor;
 import org.objectweb.asm.ClassVisitor;
@@ -25,6 +26,7 @@ public class ClassInstrumenter extends ClassProbesVisitor {
 	private final IProbeArrayStrategy probeArrayStrategy;
 
 	private String className;
+	private final IInstrSupport instrSupport = ExecutionData.getInstrSupport();
 
 	/**
 	 * Emits a instrumented version of this class to the given class visitor.
@@ -52,7 +54,7 @@ public class ClassInstrumenter extends ClassProbesVisitor {
 	@Override
 	public FieldVisitor visitField(final int access, final String name,
 			final String desc, final String signature, final Object value) {
-		InstrSupport.assertNotInstrumented(name, className);
+		instrSupport.assertNotInstrumented(name, className);
 		return super.visitField(access, name, desc, signature, value);
 	}
 
@@ -60,7 +62,7 @@ public class ClassInstrumenter extends ClassProbesVisitor {
 	public MethodProbesVisitor visitMethod(final int access, final String name,
 			final String desc, final String signature, final String[] exceptions) {
 
-		InstrSupport.assertNotInstrumented(name, className);
+		instrSupport.assertNotInstrumented(name, className);
 
 		final MethodVisitor mv = cv.visitMethod(access, name, desc, signature,
 				exceptions);

@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.jacoco.core.internal.instr;
 
+import org.jacoco.core.data.ExecutionData;
 import org.jacoco.core.runtime.IExecutionDataAccessorGenerator;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
@@ -23,11 +24,13 @@ import org.objectweb.asm.Opcodes;
  * for its initialization into interface initialization method.
  */
 class InterfaceFieldProbeArrayStrategy implements IProbeArrayStrategy {
-
+	private static final IInstrSupport instrSupport = ExecutionData
+			.getInstrSupport();
 	/**
 	 * Frame stack with a single boolean array.
 	 */
-	private static final Object[] FRAME_STACK_ARRZ = new Object[] { InstrSupport.DATAFIELD_DESC };
+	private static final Object[] FRAME_STACK_ARRZ = new Object[] {
+			instrSupport.getDatafieldDesc() };
 
 	/**
 	 * Empty frame locals.
@@ -64,7 +67,8 @@ class InterfaceFieldProbeArrayStrategy implements IProbeArrayStrategy {
 			// Stack[0]: [Z
 
 			mv.visitFieldInsn(Opcodes.PUTSTATIC, className,
-					InstrSupport.DATAFIELD_NAME, InstrSupport.DATAFIELD_DESC);
+					instrSupport.getDatafieldName(),
+					instrSupport.getDatafieldDesc());
 
 			// Stack[0]: [Z
 
@@ -74,8 +78,8 @@ class InterfaceFieldProbeArrayStrategy implements IProbeArrayStrategy {
 			return Math.max(maxStack, 2);
 		} else {
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, className,
-					InstrSupport.INITMETHOD_NAME, InstrSupport.INITMETHOD_DESC,
-					true);
+					instrSupport.getInitmethodName(),
+					instrSupport.getInitmethodDesc(), true);
 			mv.visitVarInsn(Opcodes.ASTORE, variable);
 			return 1;
 		}
@@ -90,20 +94,21 @@ class InterfaceFieldProbeArrayStrategy implements IProbeArrayStrategy {
 	}
 
 	private void createDataField(final ClassVisitor cv) {
-		cv.visitField(InstrSupport.DATAFIELD_INTF_ACC,
-				InstrSupport.DATAFIELD_NAME, InstrSupport.DATAFIELD_DESC, null,
-				null);
+		cv.visitField(instrSupport.getDatafieldIntfAcc(),
+				instrSupport.getDatafieldName(),
+				instrSupport.getDatafieldDesc(), null, null);
 	}
 
 	private void createInitMethod(final ClassVisitor cv, final int probeCount) {
-		final MethodVisitor mv = cv.visitMethod(InstrSupport.INITMETHOD_ACC,
-				InstrSupport.INITMETHOD_NAME, InstrSupport.INITMETHOD_DESC,
-				null, null);
+		final MethodVisitor mv = cv.visitMethod(instrSupport.getInitmethodAcc(),
+				instrSupport.getInitmethodName(),
+				instrSupport.getInitmethodDesc(), null, null);
 		mv.visitCode();
 
 		// Load the value of the static data field:
 		mv.visitFieldInsn(Opcodes.GETSTATIC, className,
-				InstrSupport.DATAFIELD_NAME, InstrSupport.DATAFIELD_DESC);
+				instrSupport.getDatafieldName(),
+				instrSupport.getDatafieldDesc());
 		mv.visitInsn(Opcodes.DUP);
 
 		// Stack[1]: [Z
@@ -133,8 +138,9 @@ class InterfaceFieldProbeArrayStrategy implements IProbeArrayStrategy {
 
 	private void createClinitMethod(final ClassVisitor cv,
 			final int probeCount) {
-		final MethodVisitor mv = cv.visitMethod(InstrSupport.CLINIT_ACC,
-				InstrSupport.CLINIT_NAME, InstrSupport.CLINIT_DESC, null, null);
+		final MethodVisitor mv = cv.visitMethod(instrSupport.getClinitAcc(),
+				instrSupport.getClinitName(), instrSupport.getClinitDesc(),
+				null, null);
 		mv.visitCode();
 
 		final int maxStack = accessorGenerator.generateDataAccessor(classId,
@@ -143,7 +149,8 @@ class InterfaceFieldProbeArrayStrategy implements IProbeArrayStrategy {
 		// Stack[0]: [Z
 
 		mv.visitFieldInsn(Opcodes.PUTSTATIC, className,
-				InstrSupport.DATAFIELD_NAME, InstrSupport.DATAFIELD_DESC);
+				instrSupport.getDatafieldName(),
+				instrSupport.getDatafieldDesc());
 
 		mv.visitInsn(Opcodes.RETURN);
 

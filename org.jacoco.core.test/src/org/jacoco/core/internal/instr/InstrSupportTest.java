@@ -26,6 +26,7 @@ public class InstrSupportTest {
 
 	private Printer printer;
 	private TraceMethodVisitor trace;
+	private final IInstrSupport instrSupport = new InstrSupport();
 
 	@Before
 	public void setup() {
@@ -35,94 +36,94 @@ public class InstrSupportTest {
 
 	@Test
 	public void testAssertNotIntrumentedPositive() {
-		InstrSupport.assertNotInstrumented("run", "Foo");
+		instrSupport.assertNotInstrumented("run", "Foo");
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testAssertNotIntrumentedField() {
-		InstrSupport.assertNotInstrumented("$jacocoData", "Foo");
+		instrSupport.assertNotInstrumented("$jacocoData", "Foo");
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testAssertNotIntrumentedMethod() {
-		InstrSupport.assertNotInstrumented("$jacocoInit", "Foo");
+		instrSupport.assertNotInstrumented("$jacocoInit", "Foo");
 	}
 
 	@Test
 	public void testPushIntM2147483648() {
-		InstrSupport.push(trace, -2147483648);
+		instrSupport.push(trace, -2147483648);
 		assertInstruction("LDC -2147483648");
 	}
 
 	@Test
 	public void testPushIntM32768() {
-		InstrSupport.push(trace, -32768);
+		instrSupport.push(trace, -32768);
 		assertInstruction("SIPUSH -32768");
 	}
 
 	@Test
 	public void testPushIntM128() {
-		InstrSupport.push(trace, -128);
+		instrSupport.push(trace, -128);
 		assertInstruction("BIPUSH -128");
 	}
 
 	@Test
 	public void testPushIntM1() {
-		InstrSupport.push(trace, -1);
+		instrSupport.push(trace, -1);
 		assertInstruction("ICONST_M1");
 	}
 
 	@Test
 	public void testPushInt0() {
-		InstrSupport.push(trace, 0);
+		instrSupport.push(trace, 0);
 		assertInstruction("ICONST_0");
 	}
 
 	@Test
 	public void testPushInt1() {
-		InstrSupport.push(trace, 1);
+		instrSupport.push(trace, 1);
 		assertInstruction("ICONST_1");
 	}
 
 	@Test
 	public void testPushInt2() {
-		InstrSupport.push(trace, 2);
+		instrSupport.push(trace, 2);
 		assertInstruction("ICONST_2");
 	}
 
 	@Test
 	public void testPushInt3() {
-		InstrSupport.push(trace, 3);
+		instrSupport.push(trace, 3);
 		assertInstruction("ICONST_3");
 	}
 
 	@Test
 	public void testPushInt4() {
-		InstrSupport.push(trace, 4);
+		instrSupport.push(trace, 4);
 		assertInstruction("ICONST_4");
 	}
 
 	@Test
 	public void testPushInt5() {
-		InstrSupport.push(trace, 5);
+		instrSupport.push(trace, 5);
 		assertInstruction("ICONST_5");
 	}
 
 	@Test
 	public void testPushInt127() {
-		InstrSupport.push(trace, 127);
+		instrSupport.push(trace, 127);
 		assertInstruction("BIPUSH 127");
 	}
 
 	@Test
 	public void testPushInt32767() {
-		InstrSupport.push(trace, 32767);
+		instrSupport.push(trace, 32767);
 		assertInstruction("SIPUSH 32767");
 	}
 
 	@Test
 	public void testPushInt2147483647() {
-		InstrSupport.push(trace, 2147483647);
+		instrSupport.push(trace, 2147483647);
 		assertInstruction("LDC 2147483647");
 	}
 

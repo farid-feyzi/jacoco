@@ -19,20 +19,16 @@ import org.objectweb.asm.Opcodes;
 /**
  * Constants and utilities for byte code instrumentation.
  */
-public final class InstrSupport {
-
-	private InstrSupport() {
-	}
+public class InstrSupport implements IInstrSupport {
 
 	/** ASM API version */
 	public static final int ASM_API_VERSION = Opcodes.ASM5;
-
 	// === Data Field ===
 
 	/**
 	 * Name of the field that stores coverage information of a class.
 	 */
-	public static final String DATAFIELD_NAME = "$jacocoData";
+	static final String DATAFIELD_NAME = "$jacocoData";
 
 	/**
 	 * Access modifiers of the field that stores coverage information of a
@@ -50,8 +46,8 @@ public final class InstrSupport {
 	 * </p>
 	 * </blockquote>
 	 */
-	public static final int DATAFIELD_ACC = Opcodes.ACC_SYNTHETIC
-			| Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_TRANSIENT;
+	static final int DATAFIELD_ACC = Opcodes.ACC_SYNTHETIC | Opcodes.ACC_PRIVATE
+			| Opcodes.ACC_STATIC | Opcodes.ACC_TRANSIENT;
 
 	/**
 	 * Access modifiers of the field that stores coverage information of a Java
@@ -69,31 +65,31 @@ public final class InstrSupport {
 	 * </p>
 	 * </blockquote>
 	 */
-	public static final int DATAFIELD_INTF_ACC = Opcodes.ACC_SYNTHETIC
+	static final int DATAFIELD_INTF_ACC = Opcodes.ACC_SYNTHETIC
 			| Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL;
 
 	/**
 	 * Data type of the field that stores coverage information for a class (
 	 * <code>boolean[]</code>).
 	 */
-	public static final String DATAFIELD_DESC = "[Z";
+	static final String DATAFIELD_DESC = "[Z";
 
 	// === Init Method ===
 
 	/**
 	 * Name of the initialization method.
 	 */
-	public static final String INITMETHOD_NAME = "$jacocoInit";
+	static final String INITMETHOD_NAME = "$jacocoInit";
 
 	/**
 	 * Descriptor of the initialization method.
 	 */
-	public static final String INITMETHOD_DESC = "()[Z";
+	static final String INITMETHOD_DESC = "()[Z";
 
 	/**
 	 * Access modifiers of the initialization method.
 	 */
-	public static final int INITMETHOD_ACC = Opcodes.ACC_SYNTHETIC
+	static final int INITMETHOD_ACC = Opcodes.ACC_SYNTHETIC
 			| Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC;
 
 	/**
@@ -170,11 +166,12 @@ public final class InstrSupport {
 	 *             thrown if the member has the same name than the
 	 *             instrumentation member
 	 */
-	public static void assertNotInstrumented(final String member,
-			final String owner) throws IllegalStateException {
-		if (member.equals(DATAFIELD_NAME) || member.equals(INITMETHOD_NAME)) {
-			throw new IllegalStateException(format(
-					"Class %s is already instrumented.", owner));
+	public void assertNotInstrumented(final String member, final String owner)
+			throws IllegalStateException {
+		if (member.equals(getDatafieldName())
+				|| member.equals(INITMETHOD_NAME)) {
+			throw new IllegalStateException(
+					format("Class %s is already instrumented.", owner));
 		}
 	}
 
@@ -188,7 +185,7 @@ public final class InstrSupport {
 	 * @param value
 	 *            the value to be pushed on the stack.
 	 */
-	public static void push(final MethodVisitor mv, final int value) {
+	public void push(final MethodVisitor mv, final int value) {
 		if (value >= -1 && value <= 5) {
 			mv.visitInsn(Opcodes.ICONST_0 + value);
 		} else if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE) {
@@ -198,6 +195,124 @@ public final class InstrSupport {
 		} else {
 			mv.visitLdcInsn(Integer.valueOf(value));
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jacoco.core.internal.instr.IInstrSupport#insertProbe(int)
+	 */
+	public void insertProbe(final MethodVisitor mv, final int id,
+			final int variable) {
+		// For a probe we set the corresponding position in the boolean[] array
+		// to true.
+
+		mv.visitVarInsn(Opcodes.ALOAD, variable);
+
+		// Stack[0]: [Z
+
+		push(mv, id);
+
+		// Stack[1]: I
+		// Stack[0]: [Z
+
+		mv.visitInsn(Opcodes.ICONST_1);
+
+		// Stack[2]: I
+		// Stack[1]: I
+		// Stack[0]: [Z
+
+		mv.visitInsn(Opcodes.BASTORE);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jacoco.core.internal.instr.IInstrSupport#getDatafieldName()
+	 */
+	public String getDatafieldName() {
+		return DATAFIELD_NAME;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jacoco.core.internal.instr.IInstrSupport#getDatafieldAcc()
+	 */
+	public int getDatafieldAcc() {
+		return DATAFIELD_ACC;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jacoco.core.internal.instr.IInstrSupport#getDatafieldIntfAcc()
+	 */
+	public int getDatafieldIntfAcc() {
+		return DATAFIELD_INTF_ACC;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jacoco.core.internal.instr.IInstrSupport#getDatafieldDesc()
+	 */
+	public String getDatafieldDesc() {
+		return DATAFIELD_DESC;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jacoco.core.internal.instr.IInstrSupport#getInitmethodName()
+	 */
+	public String getInitmethodName() {
+		return INITMETHOD_NAME;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jacoco.core.internal.instr.IInstrSupport#getInitmethodDesc()
+	 */
+	public String getInitmethodDesc() {
+		return INITMETHOD_DESC;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jacoco.core.internal.instr.IInstrSupport#getInitmethodAcc()
+	 */
+	public int getInitmethodAcc() {
+		return INITMETHOD_ACC;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jacoco.core.internal.instr.IInstrSupport#getClinitName()
+	 */
+	public String getClinitName() {
+		return CLINIT_NAME;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jacoco.core.internal.instr.IInstrSupport#getClinitDesc()
+	 */
+	public String getClinitDesc() {
+		return CLINIT_DESC;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jacoco.core.internal.instr.IInstrSupport#getClinitAcc()
+	 */
+	public int getClinitAcc() {
+		return CLINIT_ACC;
 	}
 
 }

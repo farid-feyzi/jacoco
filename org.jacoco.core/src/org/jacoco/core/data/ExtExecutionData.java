@@ -11,43 +11,46 @@
  *******************************************************************************/
 package org.jacoco.core.data;
 
+import static java.lang.String.format;
+
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.jacoco.core.internal.data.CompactDataInput;
 import org.jacoco.core.internal.data.CompactDataOutput;
+import org.jacoco.core.internal.instr.ExtInstrSupport;
 import org.jacoco.core.internal.instr.IInstrSupport;
 
 /**
- * Execution data for a single Java class. While instances are immutable care
- * has to be taken about the probe data array of type <code>boolean[]</code>
- * which can be modified.
+ * @author LLT
+ *
  */
-public final class ExecutionData {
-	/**
-	 * dataType indicates whether to use the original implementation of jacoco
-	 * or the extended one.
-	 */
-	public static DataType dataType = DataType.ORIGINAL; // as default
-	private IExecutionData execData;
+public class ExtExecutionData implements IExecutionData {
+	private static final IInstrSupport instrSupport = new ExtInstrSupport();
+	private final long id;
+	private final String name;
+	private final int[] probes;
 
 	/**
-	 * Creates a new {@link ExecutionData} object with the given probe data.
+	 * Creates a new {@link OrgExecutionData} object with the given probe data
+	 * length. All probes are set to <code>false</code>.
 	 * 
 	 * @param id
 	 *            class identifier
 	 * @param name
 	 *            VM name
 	 * @param probes
-	 *            probe data
+	 *            probe count
 	 */
-	@Deprecated
-	public ExecutionData(final long id, final String name,
-			final boolean[] probes) {
-		execData = new OrgExecutionData(id, name, probes);
+	public ExtExecutionData(final long id, final String name,
+			final int[] probes) {
+		this.id = id;
+		this.name = name;
+		this.probes = probes;
 	}
 
 	/**
-	 * Creates a new {@link ExecutionData} object with the given probe data
+	 * Creates a new {@link ExtExecutionData} object with the given probe data
 	 * length. All probes are set to <code>false</code>.
 	 * 
 	 * @param id
@@ -57,25 +60,11 @@ public final class ExecutionData {
 	 * @param probeCount
 	 *            probe count
 	 */
-	public ExecutionData(final long id, final String name,
+	public ExtExecutionData(final long id, final String name,
 			final int probeCount) {
-		switch (dataType) {
-		case EXTENDED:
-			execData = new ExtExecutionData(id, name, probeCount);
-			break;
-		default:
-			execData = new OrgExecutionData(id, name, probeCount);
-			break;
-		}
-	}
-
-	/**
-	 * create an ExecutionData wrapper from data
-	 * 
-	 * @param execData the execution data needs to be wrapped.
-	 */
-	public ExecutionData(final IExecutionData execData) {
-		this.execData = execData;
+		this.id = id;
+		this.name = name;
+		this.probes = new int[probeCount];
 	}
 
 	/**
@@ -85,7 +74,7 @@ public final class ExecutionData {
 	 * @return class identifier
 	 */
 	public long getId() {
-		return execData.getId();
+		return id;
 	}
 
 	/**
@@ -94,7 +83,7 @@ public final class ExecutionData {
 	 * @return VM name
 	 */
 	public String getName() {
-		return execData.getName();
+		return name;
 	}
 
 	/**
@@ -104,14 +93,23 @@ public final class ExecutionData {
 	 * @return probe data
 	 */
 	public boolean[] getProbes() {
-		return execData.getProbes();
+		if (probes == null) {
+			return null;
+		}
+		final boolean[] result = new boolean[probes.length];
+		for (int i = 0; i < probes.length; i++) {
+			final boolean cover = probes[i] > 0 ? true : false;
+			result[i] = cover;
+		}
+
+		return result;
 	}
 
 	/**
 	 * Sets all probes to <code>false</code>.
 	 */
 	public void reset() {
-		execData.reset();
+		Arrays.fill(probes, 0);
 	}
 
 	/**
@@ -120,7 +118,12 @@ public final class ExecutionData {
 	 * @return <code>true</code>, if at least one probe has been hit
 	 */
 	public boolean hasHits() {
-		return execData.hasHits();
+		for (final int probe : probes) {
+			if (probe > 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -138,8 +141,8 @@ public final class ExecutionData {
 	 * @param other
 	 *            execution data to merge
 	 */
-	public void merge(final ExecutionData other) {
-		execData.merge(other.execData);
+	public void merge(final IExecutionData other) {
+		merge(other, true);
 	}
 
 	/**
@@ -152,21 +155,53 @@ public final class ExecutionData {
 	 * A or B
 	 * </pre>
 	 * 
-	 * For <code>flag==true</code> this can be considered as a subtraction
+	 * For <code>flag==false</code> this can be considered as a subtraction
 	 * 
 	 * <pre>
-	 * A and not B
+	 * remove count for B in A
 	 * </pre>
 	 * 
 	 * The probe array of the other object is not modified.
 	 * 
-	 * @param other
+	 * @param execData
 	 *            execution data to merge
 	 * @param flag
 	 *            merge mode
 	 */
-	public void merge(final ExecutionData other, final boolean flag) {
-		execData.merge(other.execData, flag);
+	public void merge(final IExecutionData execData, final boolean flag) {
+		final ExtExecutionData other = (ExtExecutionData) execData;
+		assertCompatibility(other.getId(), other.getName(),
+				other.getExtProbes().length);
+		final int[] otherData = other.getExtProbes();
+		// if join mode
+		if (flag) {
+			for (int i = 0; i < probes.length; i++) {
+				if (otherData[i] > 0) {
+					probes[i] += otherData[i];
+				}
+			}
+		} else {
+			// if subtraction mode
+			for (int i = 0; i < probes.length; i++) {
+				if (otherData[i] > 0) {
+					probes[i] -= otherData[i];
+				}
+			}
+		}
+	}
+
+	/**
+	 * Returns the execution data probes. A value of <code>number</code>
+	 * indicates the number of times the corresponding probe was executed.
+	 * 
+	 * @return probe data
+	 */
+	public int[] getExtProbes() {
+		return probes;
+	}
+
+	public Object getProbesDataForInstrCode() {
+		return getExtProbes();
 	}
 
 	/**
@@ -184,13 +219,22 @@ public final class ExecutionData {
 	 *             if the given parameters do not match this instance
 	 */
 	public void assertCompatibility(final long id, final String name,
-			final int probecount) throws IllegalStateException {
-		execData.assertCompatibility(id, name, probecount);
-	}
-
-	@Override
-	public String toString() {
-		return execData.toString();
+			final int probecount) {
+		if (this.id != id) {
+			throw new IllegalStateException(
+					format("Different ids (%016x and %016x).",
+							Long.valueOf(this.id), Long.valueOf(id)));
+		}
+		if (!this.name.equals(name)) {
+			throw new IllegalStateException(
+					format("Different class names %s and %s for id %016x.",
+							this.name, name, Long.valueOf(id)));
+		}
+		if (this.probes.length != probecount) {
+			throw new IllegalStateException(
+					format("Incompatible execution data for class %s with id %016x.",
+							name, Long.valueOf(id)));
+		}
 	}
 
 	/**
@@ -203,25 +247,12 @@ public final class ExecutionData {
 	 * @throws IOException
 	 *             might be thrown by the underlying input stream
 	 */
-	public static ExecutionData read(final CompactDataInput in)
+	public static IExecutionData read(final CompactDataInput in)
 			throws IOException {
-		final IExecutionData execData;
-		if (dataType == DataType.EXTENDED) {
-			execData = ExtExecutionData.read(in);
-		} else {
-			execData = OrgExecutionData.read(in);
-		}
-
-		return new ExecutionData(execData);
-	}
-
-	/**
-	 * get the real data need to write in instrumented code.
-	 * 
-	 * @return the probes object of execution data (boolean[] by default)
-	 */
-	public Object getProbesDataForInstrCode() {
-		return execData.getProbesDataForInstrCode();
+		final long id = in.readLong();
+		final String name = in.readUTF();
+		final int[] probes = in.readIntArray();
+		return new ExtExecutionData(id, name, probes);
 	}
 
 	/**
@@ -231,33 +262,17 @@ public final class ExecutionData {
 	 * @throws IOException might be thrown by the underlying output stream
 	 */
 	public void write(final CompactDataOutput out) throws IOException {
-		execData.write(out);
+		out.writeLong(getId());
+		out.writeUTF(getName());
+		out.writeIntArray(getExtProbes());
 	}
 
 	/**
 	 * @return specific instrumentation supporter which create instrumentation
-	 *         byte code base on execution data structure.
+	 *         byte code, for this extended version of execution data.
 	 */
 	public static IInstrSupport getInstrSupport() {
-		if (dataType == DataType.EXTENDED) {
-			return ExtExecutionData.getInstrSupport();
-		}
-		return OrgExecutionData.getInstrSupport();
-	}
-
-	/**
-	 * @author LLT
-	 *
-	 */
-	public static enum DataType {
-		/**
-		 * the original one of jacoco which store probes as a boolean array.
-		 */
-		ORIGINAL,
-		/**
-		 * the extended one which store probes as a integer array.
-		 */
-		EXTENDED
+		return instrSupport;
 	}
 
 }

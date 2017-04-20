@@ -18,7 +18,8 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.util.Map;
 
-import org.jacoco.core.internal.instr.InstrSupport;
+import org.jacoco.core.data.ExecutionData;
+import org.jacoco.core.internal.instr.IInstrSupport;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -29,6 +30,7 @@ import org.objectweb.asm.Opcodes;
  */
 public class URLStreamHandlerRuntime extends AbstractRuntime {
 
+	private final IInstrSupport instrSupport = ExecutionData.getInstrSupport();
 	private static final String PROTOCOLPREFIX = "jacoco-";
 
 	private final String protocol;
@@ -122,7 +124,7 @@ public class URLStreamHandlerRuntime extends AbstractRuntime {
 
 		mv.visitInsn(Opcodes.ICONST_0);
 		mv.visitInsn(Opcodes.AALOAD);
-		mv.visitTypeInsn(Opcodes.CHECKCAST, InstrSupport.DATAFIELD_DESC);
+		mv.visitTypeInsn(Opcodes.CHECKCAST, instrSupport.getDatafieldDesc());
 
 		return 7;
 	}

@@ -15,6 +15,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.jacoco.core.data.ExecutionData;
+import org.jacoco.core.internal.instr.IInstrSupport;
 import org.jacoco.core.internal.instr.InstrSupport;
 import org.jacoco.core.test.TargetLoader;
 import org.junit.After;
@@ -39,6 +41,8 @@ public abstract class RuntimeTestBase {
 	private TestStorage storage;
 
 	abstract IRuntime createRuntime();
+
+	private final IInstrSupport instrSupport = ExecutionData.getInstrSupport();
 
 	@Before
 	public void setup() throws Exception {
@@ -113,9 +117,9 @@ public abstract class RuntimeTestBase {
 				"java/lang/Object",
 				new String[] { Type.getInternalName(ITarget.class) });
 
-		writer.visitField(InstrSupport.DATAFIELD_ACC,
-				InstrSupport.DATAFIELD_NAME, InstrSupport.DATAFIELD_DESC, null,
-				null);
+		writer.visitField(instrSupport.getDatafieldAcc(),
+				instrSupport.getDatafieldName(),
+				instrSupport.getDatafieldDesc(), null, null);
 
 		// Constructor
 		GeneratorAdapter gen = new GeneratorAdapter(writer.visitMethod(
@@ -128,8 +132,8 @@ public abstract class RuntimeTestBase {
 		gen.loadThis();
 		final int size = runtime.generateDataAccessor(classid, className, 2,
 				gen);
-		gen.putStatic(classType, InstrSupport.DATAFIELD_NAME,
-				Type.getObjectType(InstrSupport.DATAFIELD_DESC));
+		gen.putStatic(classType, instrSupport.getDatafieldName(),
+				Type.getObjectType(instrSupport.getDatafieldDesc()));
 		gen.returnValue();
 		gen.visitMaxs(size + 1, 0);
 		gen.visitEnd();
@@ -139,8 +143,8 @@ public abstract class RuntimeTestBase {
 				"get", "()[Z", null, new String[0]), Opcodes.ACC_PUBLIC, "get",
 				"()[Z");
 		gen.visitCode();
-		gen.getStatic(classType, InstrSupport.DATAFIELD_NAME,
-				Type.getObjectType(InstrSupport.DATAFIELD_DESC));
+		gen.getStatic(classType, instrSupport.getDatafieldName(),
+				Type.getObjectType(instrSupport.getDatafieldDesc()));
 		gen.returnValue();
 		gen.visitMaxs(1, 0);
 		gen.visitEnd();
@@ -149,8 +153,8 @@ public abstract class RuntimeTestBase {
 		gen = new GeneratorAdapter(writer.visitMethod(Opcodes.ACC_PUBLIC, "a",
 				"()V", null, new String[0]), Opcodes.ACC_PUBLIC, "a", "()V");
 		gen.visitCode();
-		gen.getStatic(classType, InstrSupport.DATAFIELD_NAME,
-				Type.getObjectType(InstrSupport.DATAFIELD_DESC));
+		gen.getStatic(classType, instrSupport.getDatafieldName(),
+				Type.getObjectType(instrSupport.getDatafieldDesc()));
 		gen.push(0);
 		gen.push(1);
 		gen.arrayStore(Type.BOOLEAN_TYPE);
@@ -162,8 +166,8 @@ public abstract class RuntimeTestBase {
 		gen = new GeneratorAdapter(writer.visitMethod(Opcodes.ACC_PUBLIC, "b",
 				"()V", null, new String[0]), Opcodes.ACC_PUBLIC, "b", "()V");
 		gen.visitCode();
-		gen.getStatic(classType, InstrSupport.DATAFIELD_NAME,
-				Type.getObjectType(InstrSupport.DATAFIELD_DESC));
+		gen.getStatic(classType, instrSupport.getDatafieldName(),
+				Type.getObjectType(instrSupport.getDatafieldDesc()));
 		gen.push(1);
 		gen.push(1);
 		gen.arrayStore(Type.BOOLEAN_TYPE);

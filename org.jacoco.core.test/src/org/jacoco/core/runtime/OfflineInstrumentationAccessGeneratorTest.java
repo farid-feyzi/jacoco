@@ -15,8 +15,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 import org.jacoco.core.JaCoCo;
+import org.jacoco.core.data.ExecutionData;
 import org.jacoco.core.instr.MethodRecorder;
-import org.jacoco.core.internal.instr.InstrSupport;
+import org.jacoco.core.internal.instr.IInstrSupport;
 import org.jacoco.core.test.TargetLoader;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -33,6 +34,7 @@ import org.objectweb.asm.commons.Method;
 public class OfflineInstrumentationAccessGeneratorTest {
 
 	private IExecutionDataAccessorGenerator generator;
+	private final IInstrSupport instrSupport = ExecutionData.getInstrSupport();
 
 	private static boolean[] probes;
 
@@ -94,9 +96,9 @@ public class OfflineInstrumentationAccessGeneratorTest {
 				"java/lang/Object",
 				new String[] { Type.getInternalName(ITarget.class) });
 
-		writer.visitField(InstrSupport.DATAFIELD_ACC,
-				InstrSupport.DATAFIELD_NAME, InstrSupport.DATAFIELD_DESC, null,
-				null);
+		writer.visitField(instrSupport.getDatafieldAcc(),
+				instrSupport.getDatafieldName(),
+				instrSupport.getDatafieldDesc(), null, null);
 
 		// Constructor
 		GeneratorAdapter gen = new GeneratorAdapter(writer.visitMethod(
@@ -109,8 +111,8 @@ public class OfflineInstrumentationAccessGeneratorTest {
 		gen.loadThis();
 		final int size = generator.generateDataAccessor(classid, className, 2,
 				gen);
-		gen.putStatic(classType, InstrSupport.DATAFIELD_NAME,
-				Type.getObjectType(InstrSupport.DATAFIELD_DESC));
+		gen.putStatic(classType, instrSupport.getDatafieldName(),
+				Type.getObjectType(instrSupport.getDatafieldDesc()));
 		gen.returnValue();
 		gen.visitMaxs(size + 1, 0);
 		gen.visitEnd();
@@ -120,8 +122,8 @@ public class OfflineInstrumentationAccessGeneratorTest {
 				"get", "()[Z", null, new String[0]), Opcodes.ACC_PUBLIC, "get",
 				"()[Z");
 		gen.visitCode();
-		gen.getStatic(classType, InstrSupport.DATAFIELD_NAME,
-				Type.getObjectType(InstrSupport.DATAFIELD_DESC));
+		gen.getStatic(classType, instrSupport.getDatafieldName(),
+				Type.getObjectType(instrSupport.getDatafieldDesc()));
 		gen.returnValue();
 		gen.visitMaxs(1, 0);
 		gen.visitEnd();

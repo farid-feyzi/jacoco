@@ -13,8 +13,9 @@ package org.jacoco.core.internal.analysis;
 
 import static org.junit.Assert.assertEquals;
 
+import org.jacoco.core.data.ExecutionData;
 import org.jacoco.core.internal.flow.MethodProbesVisitor;
-import org.jacoco.core.internal.instr.InstrSupport;
+import org.jacoco.core.internal.instr.IInstrSupport;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.asm.Opcodes;
@@ -26,6 +27,7 @@ public class ClassAnalyzerTest {
 
 	private ClassAnalyzer analyzer;
 	private ClassCoverageImpl coverage;
+	private final IInstrSupport InstrSupport = ExecutionData.getInstrSupport();
 
 	@Before
 	public void setup() {
@@ -37,16 +39,16 @@ public class ClassAnalyzerTest {
 
 	@Test(expected = IllegalStateException.class)
 	public void testAnalyzeInstrumentedClass1() {
-		analyzer.visitField(InstrSupport.DATAFIELD_ACC,
-				InstrSupport.DATAFIELD_NAME, InstrSupport.DATAFIELD_DESC, null,
-				null);
+		analyzer.visitField(InstrSupport.getDatafieldAcc(),
+				InstrSupport.getDatafieldName(),
+				InstrSupport.getDatafieldDesc(), null, null);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testAnalyzeInstrumentedClass2() {
-		analyzer.visitMethod(InstrSupport.INITMETHOD_ACC,
-				InstrSupport.INITMETHOD_NAME, InstrSupport.INITMETHOD_DESC,
-				null, null);
+		analyzer.visitMethod(InstrSupport.getInitmethodAcc(),
+				InstrSupport.getInitmethodName(),
+				InstrSupport.getInitmethodDesc(), null, null);
 	}
 
 	@Test

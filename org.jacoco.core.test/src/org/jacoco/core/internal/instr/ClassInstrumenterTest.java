@@ -13,6 +13,7 @@ package org.jacoco.core.internal.instr;
 
 import static org.junit.Assert.assertNull;
 
+import org.jacoco.core.data.ExecutionData;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.asm.ClassVisitor;
@@ -22,7 +23,7 @@ import org.objectweb.asm.MethodVisitor;
  * Unit tests for {@link ClassInstrumenter}.
  */
 public class ClassInstrumenterTest implements IProbeArrayStrategy {
-
+	private final IInstrSupport instrSupport = ExecutionData.getInstrSupport();
 	private ClassInstrumenter instrumenter;
 
 	@Before
@@ -34,16 +35,16 @@ public class ClassInstrumenterTest implements IProbeArrayStrategy {
 
 	@Test(expected = IllegalStateException.class)
 	public void testInstrumentInstrumentedClass1() {
-		instrumenter.visitField(InstrSupport.DATAFIELD_ACC,
-				InstrSupport.DATAFIELD_NAME, InstrSupport.DATAFIELD_DESC, null,
-				null);
+		instrumenter.visitField(instrSupport.getDatafieldAcc(),
+				instrSupport.getDatafieldName(),
+				instrSupport.getDatafieldDesc(), null, null);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testInstrumentInstrumentedClass2() {
-		instrumenter.visitMethod(InstrSupport.INITMETHOD_ACC,
-				InstrSupport.INITMETHOD_NAME, InstrSupport.INITMETHOD_DESC,
-				null, null);
+		instrumenter.visitMethod(instrSupport.getInitmethodAcc(),
+				instrSupport.getInitmethodName(),
+				instrSupport.getInitmethodDesc(), null, null);
 	}
 
 	@Test

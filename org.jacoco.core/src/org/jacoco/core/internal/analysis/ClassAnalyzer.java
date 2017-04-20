@@ -12,9 +12,10 @@
 package org.jacoco.core.internal.analysis;
 
 import org.jacoco.core.analysis.IMethodCoverage;
+import org.jacoco.core.data.ExecutionData;
 import org.jacoco.core.internal.flow.ClassProbesVisitor;
 import org.jacoco.core.internal.flow.MethodProbesVisitor;
-import org.jacoco.core.internal.instr.InstrSupport;
+import org.jacoco.core.internal.instr.IInstrSupport;
 import org.objectweb.asm.FieldVisitor;
 
 /**
@@ -25,6 +26,7 @@ public class ClassAnalyzer extends ClassProbesVisitor {
 	private final ClassCoverageImpl coverage;
 	private final boolean[] probes;
 	private final StringPool stringPool;
+	private final IInstrSupport instrSupport = ExecutionData.getInstrSupport();
 
 	/**
 	 * Creates a new analyzer that builds coverage data for a class.
@@ -61,7 +63,7 @@ public class ClassAnalyzer extends ClassProbesVisitor {
 	public MethodProbesVisitor visitMethod(final int access, final String name,
 			final String desc, final String signature, final String[] exceptions) {
 
-		InstrSupport.assertNotInstrumented(name, coverage.getName());
+		instrSupport.assertNotInstrumented(name, coverage.getName());
 
 		return new MethodAnalyzer(coverage.getName(), coverage.getSuperName(),
 				stringPool.get(name), stringPool.get(desc),
@@ -81,7 +83,7 @@ public class ClassAnalyzer extends ClassProbesVisitor {
 	@Override
 	public FieldVisitor visitField(final int access, final String name,
 			final String desc, final String signature, final Object value) {
-		InstrSupport.assertNotInstrumented(name, coverage.getName());
+		instrSupport.assertNotInstrumented(name, coverage.getName());
 		return super.visitField(access, name, desc, signature, value);
 	}
 

@@ -98,9 +98,7 @@ public class ExecutionDataWriter implements ISessionInfoVisitor,
 		if (data.hasHits()) {
 			try {
 				out.writeByte(BLOCK_EXECUTIONDATA);
-				out.writeLong(data.getId());
-				out.writeUTF(data.getName());
-				out.writeBooleanArray(data.getProbes());
+				data.write(out);
 			} catch (final IOException e) {
 				throw new RuntimeException(e);
 			}

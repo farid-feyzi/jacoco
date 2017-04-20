@@ -12,7 +12,8 @@
 package org.jacoco.core.runtime;
 
 import org.jacoco.core.JaCoCo;
-import org.jacoco.core.internal.instr.InstrSupport;
+import org.jacoco.core.data.ExecutionData;
+import org.jacoco.core.internal.instr.IInstrSupport;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -22,9 +23,9 @@ import org.objectweb.asm.Opcodes;
  * obtain probe arrays. This generator is designed for offline instrumentation
  * only.
  */
-public class OfflineInstrumentationAccessGenerator implements
-		IExecutionDataAccessorGenerator {
-
+public class OfflineInstrumentationAccessGenerator
+		implements IExecutionDataAccessorGenerator {
+	private final IInstrSupport instrSupport = ExecutionData.getInstrSupport();
 	private final String runtimeClassName;
 
 	/**
@@ -49,7 +50,7 @@ public class OfflineInstrumentationAccessGenerator implements
 			final int probecount, final MethodVisitor mv) {
 		mv.visitLdcInsn(Long.valueOf(classid));
 		mv.visitLdcInsn(classname);
-		InstrSupport.push(mv, probecount);
+		instrSupport.push(mv, probecount);
 		mv.visitMethodInsn(Opcodes.INVOKESTATIC, runtimeClassName, "getProbes",
 				"(JLjava/lang/String;I)[Z", false);
 		return 4;

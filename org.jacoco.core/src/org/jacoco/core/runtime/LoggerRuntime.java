@@ -16,7 +16,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import org.jacoco.core.internal.instr.InstrSupport;
+import org.jacoco.core.data.ExecutionData;
+import org.jacoco.core.internal.instr.IInstrSupport;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -32,7 +33,7 @@ import org.objectweb.asm.Opcodes;
  * the parameter array.
  */
 public class LoggerRuntime extends AbstractRuntime {
-
+	private final IInstrSupport instrSupport = ExecutionData.getInstrSupport();
 	private static final String CHANNEL = "jacoco-runtime";
 
 	private final String key;
@@ -146,7 +147,7 @@ public class LoggerRuntime extends AbstractRuntime {
 
 		mv.visitInsn(Opcodes.ICONST_0);
 		mv.visitInsn(Opcodes.AALOAD);
-		mv.visitTypeInsn(Opcodes.CHECKCAST, InstrSupport.DATAFIELD_DESC);
+		mv.visitTypeInsn(Opcodes.CHECKCAST, instrSupport.getDatafieldDesc());
 
 		// Stack[0]: [Z
 

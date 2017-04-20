@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.jacoco.core.internal.instr;
 
+import org.jacoco.core.data.ExecutionData;
 import org.jacoco.core.internal.flow.ClassProbesVisitor;
 import org.jacoco.core.internal.flow.MethodProbesVisitor;
 import org.objectweb.asm.Opcodes;
@@ -19,7 +20,8 @@ import org.objectweb.asm.Opcodes;
  * Internal class to remember the total number of probes required for a class.
  */
 class ProbeCounter extends ClassProbesVisitor {
-
+	private static final IInstrSupport instrSupport = ExecutionData
+			.getInstrSupport();
 	private int count;
 	private boolean methods;
 
@@ -30,8 +32,9 @@ class ProbeCounter extends ClassProbesVisitor {
 
 	@Override
 	public MethodProbesVisitor visitMethod(final int access, final String name,
-			final String desc, final String signature, final String[] exceptions) {
-		if (!InstrSupport.CLINIT_NAME.equals(name)
+			final String desc, final String signature,
+			final String[] exceptions) {
+		if (!instrSupport.getClinitName().equals(name)
 				&& (access & Opcodes.ACC_ABSTRACT) == 0) {
 			methods = true;
 		}

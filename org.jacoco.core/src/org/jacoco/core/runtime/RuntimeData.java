@@ -16,7 +16,7 @@ import org.jacoco.core.data.ExecutionDataStore;
 import org.jacoco.core.data.IExecutionDataVisitor;
 import org.jacoco.core.data.ISessionInfoVisitor;
 import org.jacoco.core.data.SessionInfo;
-import org.jacoco.core.internal.instr.InstrSupport;
+import org.jacoco.core.internal.instr.IInstrSupport;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -26,6 +26,8 @@ import org.objectweb.asm.Opcodes;
  */
 public class RuntimeData {
 
+	private final static IInstrSupport instrSupport = ExecutionData
+			.getInstrSupport();
 	/** store for execution data */
 	protected final ExecutionDataStore store;
 
@@ -145,7 +147,7 @@ public class RuntimeData {
 		final Long classid = (Long) args[0];
 		final String name = (String) args[1];
 		final int probecount = ((Integer) args[2]).intValue();
-		args[0] = getExecutionData(classid, name, probecount).getProbes();
+		args[0] = getExecutionData(classid, name, probecount).getProbesDataForInstrCode();
 	}
 
 	/**
@@ -200,9 +202,9 @@ public class RuntimeData {
 		// Probe Count:
 		mv.visitInsn(Opcodes.DUP);
 		mv.visitInsn(Opcodes.ICONST_2);
-		InstrSupport.push(mv, probecount);
-		mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Integer",
-				"valueOf", "(I)Ljava/lang/Integer;", false);
+		instrSupport.push(mv, probecount);
+		mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf",
+				"(I)Ljava/lang/Integer;", false);
 		mv.visitInsn(Opcodes.AASTORE);
 	}
 
@@ -248,7 +250,7 @@ public class RuntimeData {
 
 		// stack[0]: [Z
 
-		mv.visitTypeInsn(Opcodes.CHECKCAST, InstrSupport.DATAFIELD_DESC);
+		mv.visitTypeInsn(Opcodes.CHECKCAST, instrSupport.getDatafieldDesc());
 	}
 
 }

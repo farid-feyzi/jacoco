@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.jacoco.core.internal.instr;
 
+import org.jacoco.core.data.ExecutionData;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -23,7 +24,7 @@ import org.objectweb.asm.Type;
  * and stored in a local variable.
  */
 class ProbeInserter extends MethodVisitor implements IProbeInserter {
-
+	private final IInstrSupport instrSupport = ExecutionData.getInstrSupport();
 	private final IProbeArrayStrategy arrayStrategy;
 
 	/**
@@ -56,7 +57,7 @@ class ProbeInserter extends MethodVisitor implements IProbeInserter {
 	ProbeInserter(final int access, final String name, final String desc, final MethodVisitor mv,
 			final IProbeArrayStrategy arrayStrategy) {
 		super(InstrSupport.ASM_API_VERSION, mv);
-		this.clinit = InstrSupport.CLINIT_NAME.equals(name);
+		this.clinit = instrSupport.getClinitName().equals(name);
 		this.arrayStrategy = arrayStrategy;
 		int pos = (Opcodes.ACC_STATIC & access) == 0 ? 1 : 0;
 		for (final Type t : Type.getArgumentTypes(desc)) {
@@ -66,26 +67,7 @@ class ProbeInserter extends MethodVisitor implements IProbeInserter {
 	}
 
 	public void insertProbe(final int id) {
-
-		// For a probe we set the corresponding position in the boolean[] array
-		// to true.
-
-		mv.visitVarInsn(Opcodes.ALOAD, variable);
-
-		// Stack[0]: [Z
-
-		InstrSupport.push(mv, id);
-
-		// Stack[1]: I
-		// Stack[0]: [Z
-
-		mv.visitInsn(Opcodes.ICONST_1);
-
-		// Stack[2]: I
-		// Stack[1]: I
-		// Stack[0]: [Z
-
-		mv.visitInsn(Opcodes.BASTORE);
+		instrSupport.insertProbe(mv, id, variable);
 	}
 
 	@Override
@@ -144,7 +126,7 @@ class ProbeInserter extends MethodVisitor implements IProbeInserter {
 		int pos = 0; // Current variable position
 		while (idx < nLocal || pos <= variable) {
 			if (pos == variable) {
-				newLocal[newIdx++] = InstrSupport.DATAFIELD_DESC;
+				newLocal[newIdx++] = instrSupport.getDatafieldDesc();
 				pos++;
 			} else {
 				if (idx < nLocal) {
