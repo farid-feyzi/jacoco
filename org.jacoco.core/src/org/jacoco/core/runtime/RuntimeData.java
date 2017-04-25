@@ -147,7 +147,7 @@ public class RuntimeData {
 		final Long classid = (Long) args[0];
 		final String name = (String) args[1];
 		final int probecount = ((Integer) args[2]).intValue();
-		args[0] = getExecutionData(classid, name, probecount).getProbesDataForInstrCode();
+		args[0] = getExecutionData(classid, name, probecount).getRawProbes();
 	}
 
 	/**

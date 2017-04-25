@@ -127,6 +127,6 @@ public interface IExecutionData {
 	 * 
 	 * @return the probes object of execution data.
 	 */
-	Object getProbesDataForInstrCode();
+	Object getRawProbes();
 
 }

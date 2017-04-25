@@ -220,8 +220,8 @@ public final class ExecutionData {
 	 * 
 	 * @return the probes object of execution data (boolean[] by default)
 	 */
-	public Object getProbesDataForInstrCode() {
-		return execData.getProbesDataForInstrCode();
+	public Object getRawProbes() {
+		return execData.getRawProbes();
 	}
 
 	/**

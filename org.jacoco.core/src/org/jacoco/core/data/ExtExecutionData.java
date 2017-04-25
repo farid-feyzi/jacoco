@@ -200,7 +200,7 @@ public class ExtExecutionData implements IExecutionData {
 		return probes;
 	}
 
-	public Object getProbesDataForInstrCode() {
+	public Object getRawProbes() {
 		return getExtProbes();
 	}
 

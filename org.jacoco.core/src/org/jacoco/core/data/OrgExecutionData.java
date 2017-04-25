@@ -103,7 +103,7 @@ public class OrgExecutionData implements IExecutionData {
 	 * 
 	 * @see org.jacoco.core.data.IExecutionData#getProbesDataForInstrCode()
 	 */
-	public Object getProbesDataForInstrCode() {
+	public Object getRawProbes() {
 		return getProbes();
 	}
 
