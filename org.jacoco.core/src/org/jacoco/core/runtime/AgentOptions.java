@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import org.jacoco.core.data.ExecutionData.ProbesType;
+
 /**
  * Utility to create and parse options for the runtime agent. Options are
  * represented as a string in the following format:
@@ -187,11 +189,16 @@ public final class AgentOptions {
 	 * name "org.jacoco:type=Runtime". Default is <code>false</code>.
 	 */
 	public static final String JMX = "jmx";
+	
+	/**
+	 * Specifies the strategy to collect probes (whether only marking covered or count covered frequency)
+	 */
+	public static final String PROBESTYPE = "probestype";
 
 	private static final Collection<String> VALID_OPTIONS = Arrays.asList(
 			DESTFILE, APPEND, INCLUDES, EXCLUDES, EXCLCLASSLOADER,
 			INCLBOOTSTRAPCLASSES, INCLNOLOCATIONCLASSES, SESSIONID, DUMPONEXIT,
-			OUTPUT, ADDRESS, PORT, CLASSDUMPDIR, JMX);
+			OUTPUT, ADDRESS, PORT, CLASSDUMPDIR, JMX, PROBESTYPE);
 
 	private final Map<String, String> options;
 
@@ -556,6 +563,23 @@ public final class AgentOptions {
 		setOption(JMX, jmx);
 	}
 
+	/**
+	 * Return which Probes type will be used in ExecutionData (whether boolean or integer array).
+	 * @return {@link ProbesType}
+	 */
+	public ProbesType getProbesType() {
+		return ProbesType.valueOf(getOption(PROBESTYPE, ProbesType.BOOLEAN.name()));
+	}
+	
+	
+	/**
+	 * Set which Probes type will be used in ExecutionData.
+	 * @param type ProbesType: boolean or integer array
+	 */
+	public void setProbesType(final ProbesType type) {
+		setOption(PROBESTYPE, type.name());
+	}
+	
 	private void setOption(final String key, final int value) {
 		setOption(key, Integer.toString(value));
 	}

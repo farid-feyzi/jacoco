@@ -24,10 +24,10 @@ import org.jacoco.core.internal.instr.IInstrSupport;
  */
 public final class ExecutionData {
 	/**
-	 * dataType indicates whether to use the original implementation of jacoco
-	 * or the extended one.
+	 * dataType indicates which type to be used to store/the strategy to collect probes
+	 * whether to only mark covered (use Boolean array) or count the covered frequency (use Integer array).
 	 */
-	public static DataType dataType = DataType.ORIGINAL; // as default
+	public static ProbesType probesType = ProbesType.BOOLEAN; // as default
 	private IExecutionData execData;
 
 	/**
@@ -59,8 +59,8 @@ public final class ExecutionData {
 	 */
 	public ExecutionData(final long id, final String name,
 			final int probeCount) {
-		switch (dataType) {
-		case EXTENDED:
+		switch (probesType) {
+		case INTEGER:
 			execData = new ExtExecutionData(id, name, probeCount);
 			break;
 		default:
@@ -206,7 +206,7 @@ public final class ExecutionData {
 	public static ExecutionData read(final CompactDataInput in)
 			throws IOException {
 		final IExecutionData execData;
-		if (dataType == DataType.EXTENDED) {
+		if (probesType == ProbesType.INTEGER) {
 			execData = ExtExecutionData.read(in);
 		} else {
 			execData = OrgExecutionData.read(in);
@@ -239,7 +239,7 @@ public final class ExecutionData {
 	 *         byte code base on execution data structure.
 	 */
 	public static IInstrSupport getInstrSupport() {
-		if (dataType == DataType.EXTENDED) {
+		if (probesType == ProbesType.INTEGER) {
 			return ExtExecutionData.getInstrSupport();
 		}
 		return OrgExecutionData.getInstrSupport();
@@ -249,15 +249,15 @@ public final class ExecutionData {
 	 * @author LLT
 	 *
 	 */
-	public static enum DataType {
+	public static enum ProbesType {
 		/**
 		 * the original one of jacoco which store probes as a boolean array.
 		 */
-		ORIGINAL,
+		BOOLEAN,
 		/**
 		 * the extended one which store probes as a integer array.
 		 */
-		EXTENDED
+		INTEGER
 	}
 
 }

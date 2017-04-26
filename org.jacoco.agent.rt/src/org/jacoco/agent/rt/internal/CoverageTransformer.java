@@ -16,6 +16,7 @@ import java.lang.instrument.IllegalClassFormatException;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 
+import org.jacoco.core.data.ExecutionData;
 import org.jacoco.core.instr.Instrumenter;
 import org.jacoco.core.runtime.AgentOptions;
 import org.jacoco.core.runtime.IRuntime;
@@ -70,6 +71,7 @@ public class CoverageTransformer implements ClassFileTransformer {
 		classFileDumper = new ClassFileDumper(options.getClassDumpDir());
 		inclBootstrapClasses = options.getInclBootstrapClasses();
 		inclNoLocationClasses = options.getInclNoLocationClasses();
+		ExecutionData.probesType = options.getProbesType();
 	}
 
 	public byte[] transform(final ClassLoader loader, final String classname,
