@@ -13,6 +13,7 @@ package org.jacoco.agent.rt.internal;
 
 import java.lang.instrument.Instrumentation;
 
+import org.jacoco.core.data.ExecutionData;
 import org.jacoco.core.runtime.AgentOptions;
 import org.jacoco.core.runtime.IRuntime;
 import org.jacoco.core.runtime.ModifiedSystemClassRuntime;
@@ -41,7 +42,8 @@ public final class PreMain {
 			throws Exception {
 
 		final AgentOptions agentOptions = new AgentOptions(options);
-
+		ExecutionData.setProbesType(agentOptions.getProbesType());
+		
 		final Agent agent = Agent.getInstance(agentOptions);
 
 		final IRuntime runtime = createRuntime(inst);
