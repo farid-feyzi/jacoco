@@ -17,6 +17,7 @@ import org.jacoco.core.data.ExecutionData;
 import org.jacoco.core.runtime.AgentOptions;
 import org.jacoco.core.runtime.IRuntime;
 import org.jacoco.core.runtime.ModifiedSystemClassRuntime;
+import org.jacoco.core.runtime.SavMock;
 
 /**
  * The agent which is referred as the <code>Premain-Class</code>. The agent
@@ -48,6 +49,7 @@ public final class PreMain {
 
 		final IRuntime runtime = createRuntime(inst);
 		runtime.startup(agent.getData());
+		SavMock.startup(agentOptions, inst, agent.getData());
 		inst.addTransformer(new CoverageTransformer(runtime, agentOptions,
 				IExceptionLogger.SYSTEM_ERR));
 	}

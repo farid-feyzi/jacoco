@@ -194,11 +194,17 @@ public final class AgentOptions {
 	 * Specifies the strategy to collect probes (whether only marking covered or count covered frequency)
 	 */
 	public static final String PROBESTYPE = "probestype";
-
+	
+	/**
+	 * SavMock is a module allow to separate testcases manually in main program,
+	 * and this parameter is the class name which is instrumented to hold SavMock.
+	 */
+	public static final String SAVMOCKCLASSNAME = "savmockclassname";
+	
 	private static final Collection<String> VALID_OPTIONS = Arrays.asList(
 			DESTFILE, APPEND, INCLUDES, EXCLUDES, EXCLCLASSLOADER,
 			INCLBOOTSTRAPCLASSES, INCLNOLOCATIONCLASSES, SESSIONID, DUMPONEXIT,
-			OUTPUT, ADDRESS, PORT, CLASSDUMPDIR, JMX, PROBESTYPE);
+			OUTPUT, ADDRESS, PORT, CLASSDUMPDIR, JMX, PROBESTYPE, SAVMOCKCLASSNAME);
 
 	private final Map<String, String> options;
 
@@ -571,7 +577,6 @@ public final class AgentOptions {
 		return ProbesType.valueOf(getOption(PROBESTYPE, ProbesType.BOOLEAN.name()));
 	}
 	
-	
 	/**
 	 * Set which Probes type will be used in ExecutionData.
 	 * @param type ProbesType: boolean or integer array
@@ -580,6 +585,21 @@ public final class AgentOptions {
 		setOption(PROBESTYPE, type.name());
 	}
 	
+	/**
+	 * @return the savmock
+	 */
+	public String getSavmockClassName() {
+		return getOption(SAVMOCKCLASSNAME, null);
+	}
+	
+	/**
+	 * enable to register sav mock or not.
+	 * @param enable
+	 */
+	public void setSavmockClassName(String enable) {
+		setOption(SAVMOCKCLASSNAME, enable);
+	}
+
 	private void setOption(final String key, final int value) {
 		setOption(key, Integer.toString(value));
 	}
