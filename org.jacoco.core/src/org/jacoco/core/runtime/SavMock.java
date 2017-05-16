@@ -115,7 +115,7 @@ public class SavMock {
 	}
 	
 	/**
-	 * this method is refered in JaCoCoMockJunitRunner. Be update accordingly if this name is changed.
+	 * this method is refered in JaCoCoMockJunitRunner. Update accordingly if this name is changed.
 	 * collectData(final String sessionId) 
 	 * @param sessionId 
 	 */
@@ -174,13 +174,14 @@ public class SavMock {
 			throws Exception {
 		final String mockClassName = agentOptions.getSavmockClassName();
 		if (mockClassName != null) {
+			final String transformedClassName = mockClassName.replace('.', '/');
 			final ClassFileTransformer transformer = new ClassFileTransformer() {
 				public byte[] transform(final ClassLoader loader,
 						final String name, final Class<?> classBeingRedefined,
 						final ProtectionDomain protectionDomain,
 						final byte[] source)
 						throws IllegalClassFormatException {
-					if (name.equals(mockClassName.replace('.', '/'))) {
+					if (name.equals(transformedClassName)) {
 						return ModifiedSystemClassRuntime.instrument(source, accessFieldName);
 					}
 					return null;

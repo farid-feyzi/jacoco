@@ -27,7 +27,7 @@ public final class ExecutionData {
 	 * dataType indicates which type to be used to store/the strategy to collect probes
 	 * whether to only mark covered (use Boolean array) or count the covered frequency (use Integer array).
 	 */
-	private static ProbesType probesType = ProbesType.INTEGER; // as default
+	private static ProbesType probesType = ProbesType.BOOLEAN; // as default
 	private IExecutionData execData;
 
 	/**
