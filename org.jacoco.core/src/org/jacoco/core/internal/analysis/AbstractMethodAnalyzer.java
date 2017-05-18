@@ -310,13 +310,7 @@ public abstract class AbstractMethodAnalyzer extends MethodProbesVisitor
 		for (final Jump j : jumps) {
 			LabelInfo.getInstruction(j.target).setPredecessor(j.source);
 		}
-		setCovered();
 	}
-
-	/**
-	 * set covered based on probes infor.
-	 */
-	protected abstract void setCovered();
 
 	/**
 	 * @param probeId

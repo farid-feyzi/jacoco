@@ -102,13 +102,6 @@ public class MethodAnalyzer extends AbstractMethodAnalyzer {
 	}
 
 	@Override
-	protected void setCovered() {
-		for (final Instruction p : coveredProbes) {
-			p.setCovered();
-		}
-	}
-
-	@Override
 	protected void addProbe(final int probeId) {
 		lastInsn.addBranch();
 		if (probes != null && probes[probeId]) {
