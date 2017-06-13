@@ -106,4 +106,9 @@ public interface IInstrSupport {
 	 */
 	public void insertProbe(MethodVisitor mv, int id, int variable);
 
+	/**
+	 * @return Stack usage of code to modify probe array 
+	 */
+	public int getInsertProbeStackSize();
+
 }

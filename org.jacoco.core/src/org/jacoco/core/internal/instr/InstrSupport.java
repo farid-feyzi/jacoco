@@ -224,6 +224,14 @@ public class InstrSupport implements IInstrSupport {
 
 		mv.visitInsn(Opcodes.BASTORE);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.jacoco.core.internal.instr.IInstrSupport#getInsertProbeStackSize()
+	 * max stack size use for code generated in insertProbe()
+	 */
+	public int getInsertProbeStackSize() {
+		return 3;
+	}
 
 	/*
 	 * (non-Javadoc)

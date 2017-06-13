@@ -27,6 +27,7 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jacoco.core.data.ExecutionData;
 import org.jacoco.core.data.ExecutionDataWriter;
 import org.jacoco.core.data.SessionInfo;
 
@@ -35,7 +36,6 @@ import org.jacoco.core.data.SessionInfo;
  *
  */
 public class SavMock {
-	private boolean enableFileLog = false;
 	/**
 	 * savMock field in instrumented class.
 	 */
@@ -46,6 +46,7 @@ public class SavMock {
 	private File destFile;
 	private boolean append;
 	private File logFile;
+	private String errorLogFile;
 	
 	/**
 	 * @param data runtimeData
@@ -56,6 +57,7 @@ public class SavMock {
 		this.data = data;
 		this.destFile = new File(options.getDestfile()).getAbsoluteFile();
 		this.append = options.getAppend();
+		this.errorLogFile = options.getSavLogFile();
 		final File folder = destFile.getParentFile();
 		if (folder != null) {
 			folder.mkdirs();
@@ -135,8 +137,14 @@ public class SavMock {
 						super.visitSessionInfo(info);
 					}
 				};
+				@Override
+				public void visitClassExecution(ExecutionData data) {
+					super.visitClassExecution(data);
+					log(data.getRawProbes().toString());
+				}
 			};
 			data.collect(writer, writer, true);
+			
 			buffs.add(buffer);
 		} catch (final IOException e) {
 			log(e.getMessage() + e.getStackTrace());
@@ -147,16 +155,17 @@ public class SavMock {
 	}
 	
 	private void log(String log) {
-		if (!enableFileLog) {
+		if (errorLogFile == null) {
 			return;
 		}
 		try {
-			logFile = new File("SavMock.log");
+			logFile = new File(errorLogFile);
 			if (!logFile.exists()) {
 				logFile.createNewFile();
 			}
 			FileOutputStream out = new FileOutputStream(logFile, true);
 			out.write(log.getBytes());
+			out.write("\n".getBytes());
 			out.close();
 		} catch (Exception e) {
 			// do nothing

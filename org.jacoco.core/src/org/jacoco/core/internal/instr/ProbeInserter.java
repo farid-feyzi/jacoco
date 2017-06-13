@@ -38,7 +38,7 @@ class ProbeInserter extends MethodVisitor implements IProbeInserter {
 
 	/** Maximum stack usage of the code to access the probe array. */
 	private int accessorStackSize;
-
+	
 	/**
 	 * Creates a new {@link ProbeInserter}.
 	 * 
@@ -99,7 +99,7 @@ class ProbeInserter extends MethodVisitor implements IProbeInserter {
 		// original stack size depending on the probe locations. The accessor
 		// stack size is an absolute maximum, as the accessor code is inserted
 		// at the very beginning of each method when the stack size is empty.
-		final int increasedStack = Math.max(maxStack + 3, accessorStackSize);
+		final int increasedStack = Math.max(maxStack + instrSupport.getInsertProbeStackSize(), accessorStackSize);
 		mv.visitMaxs(increasedStack, maxLocals + 1);
 	}
 

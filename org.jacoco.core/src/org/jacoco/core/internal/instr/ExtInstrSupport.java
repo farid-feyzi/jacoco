@@ -93,4 +93,11 @@ public class ExtInstrSupport extends InstrSupport implements IInstrSupport {
 		mv.visitInsn(Opcodes.IASTORE);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.jacoco.core.internal.instr.InstrSupport#getInsertProbeStackSize()
+	 */
+	@Override
+	public int getInsertProbeStackSize() {
+		return 4;
+	}
 }

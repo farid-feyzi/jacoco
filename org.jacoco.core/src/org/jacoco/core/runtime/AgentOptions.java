@@ -118,7 +118,7 @@ public final class AgentOptions {
 
 	private static final Pattern OPTION_SPLIT = Pattern
 			.compile(",(?=[a-zA-Z0-9_\\-]+=)");
-
+	
 	/**
 	 * Possible values for {@link AgentOptions#OUTPUT}.
 	 */
@@ -201,10 +201,15 @@ public final class AgentOptions {
 	 */
 	public static final String SAVMOCKCLASSNAME = "savmockclassname";
 	
+	/**
+	 * log process to file when running savmock.
+	 */
+	public static final String SAVLOGFILE = "savlog";
+	
 	private static final Collection<String> VALID_OPTIONS = Arrays.asList(
 			DESTFILE, APPEND, INCLUDES, EXCLUDES, EXCLCLASSLOADER,
 			INCLBOOTSTRAPCLASSES, INCLNOLOCATIONCLASSES, SESSIONID, DUMPONEXIT,
-			OUTPUT, ADDRESS, PORT, CLASSDUMPDIR, JMX, PROBESTYPE, SAVMOCKCLASSNAME);
+			OUTPUT, ADDRESS, PORT, CLASSDUMPDIR, JMX, PROBESTYPE, SAVMOCKCLASSNAME, SAVLOGFILE);
 
 	private final Map<String, String> options;
 
@@ -598,6 +603,21 @@ public final class AgentOptions {
 	 */
 	public void setSavmockClassName(String enable) {
 		setOption(SAVMOCKCLASSNAME, enable);
+	}
+	
+	/**
+	 * enable log for sav running.
+	 * @param fileName
+	 */
+	public void setSavLog(String fileName) {
+		setOption(SAVLOGFILE, fileName);
+	}
+	
+	/**
+	 * @return savlog enable or not.
+	 */
+	public String getSavLogFile() {
+		return getOption(SAVLOGFILE, null);
 	}
 
 	private void setOption(final String key, final int value) {
