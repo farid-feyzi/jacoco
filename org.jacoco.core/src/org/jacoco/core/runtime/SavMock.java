@@ -25,6 +25,7 @@ import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Field;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jacoco.core.data.ExecutionData;
@@ -140,6 +141,7 @@ public class SavMock {
 				@Override
 				public void visitClassExecution(ExecutionData data) {
 					super.visitClassExecution(data);
+					System.out.println(Arrays.toString((int[])data.getRawProbes()));
 					log(data.getRawProbes().toString());
 				}
 			};

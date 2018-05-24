@@ -39,9 +39,9 @@ public class ModifiedSystemClassRuntime extends AbstractRuntime {
 
 	private final Class<?> systemClass;
 
-	private final String systemClassName;
+	private final String systemClassName; // "java/util/UUID"
 
-	private final String accessFieldName;
+	private final String accessFieldName; //$jacocoAccess
 
 	/**
 	 * Creates a new runtime based on the given class and members.
